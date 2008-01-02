@@ -12,6 +12,7 @@ Group:		Video
 License:	GPL
 URL:		http://people.freenet.de/cwieninger/html/vdr-launcher.html
 Source:		http://people.freenet.de/cwieninger/vdr_1.3.11-%plugin-%version.tar.bz2
+BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.4.1-6
 Requires:	vdr-abi = %vdr_abi
 
