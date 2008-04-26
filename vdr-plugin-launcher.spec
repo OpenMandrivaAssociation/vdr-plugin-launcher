@@ -2,7 +2,7 @@
 %define plugin	launcher
 %define name	vdr-plugin-%plugin
 %define version	0.0.2a
-%define rel	12
+%define rel	13
 
 Summary:	VDR plugin: launch other plugins
 Name:		%name
@@ -12,8 +12,9 @@ Group:		Video
 License:	GPL
 URL:		http://people.freenet.de/cwieninger/html/vdr-launcher.html
 Source:		http://people.freenet.de/cwieninger/vdr_1.3.11-%plugin-%version.tar.bz2
+Patch0:		launcher-0.0.2a-i18n-1.6.patch
 BuildRoot:	%{_tmppath}/%{name}-buildroot
-BuildRequires:	vdr-devel >= 1.4.1-6
+BuildRequires:	vdr-devel >= 1.6.0
 Requires:	vdr-abi = %vdr_abi
 
 %description
@@ -23,6 +24,8 @@ access the setup menu of a plugin.
 
 %prep
 %setup -q -n %plugin-%version
+%patch0 -p1
+%vdr_plugin_prep
 
 %build
 %vdr_plugin_build
