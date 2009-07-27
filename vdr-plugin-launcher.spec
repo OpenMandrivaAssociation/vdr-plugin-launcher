@@ -2,7 +2,7 @@
 %define plugin	launcher
 %define name	vdr-plugin-%plugin
 %define version	0.0.2a
-%define rel	15
+%define rel	16
 
 Summary:	VDR plugin: launch other plugins
 Name:		%name
