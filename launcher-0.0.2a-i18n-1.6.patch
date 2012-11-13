@@ -1,0 +1,334 @@
+
+This is a semi-automatically created i18n adaptation patch and may contain
+errors (such as missing translations). This should only be used as a
+temporary measure until the upstream plugin maintainer fixes the plugin
+properly according to the instructions in i18n-to-gettext.pl.
+
+Created for Mandriva Linux packaging by Anssi Hannula <anssi@mandriva.org>.
+
+
+Index: launcher-0.0.2a/Makefile
+===================================================================
+--- launcher-0.0.2a/Makefile
++++ launcher-0.0.2a/Makefile	2008-04-24 00:26:58.000000000 +0300
+@@ -47,7 +47,7 @@
+ 
+ ### The object files (add further files here):
+ 
+-OBJS = launcher.o i18n.o
++OBJS = launcher.o 
+ 
+ ### Implicit rules:
+ 
+@@ -63,9 +63,34 @@
+ 
+ -include $(DEPFILE)
+ 
++### Internationalization (I18N):
++
++PODIR     = po
++LOCALEDIR = $(VDRDIR)/locale
++I18Npo    = $(wildcard $(PODIR)/*.po)
++I18Nmsgs  = $(addprefix $(LOCALEDIR)/, $(addsuffix /LC_MESSAGES/vdr-$(PLUGIN).mo, $(notdir $(foreach file, $(I18Npo), $(basename $(file))))))
++I18Npot   = $(PODIR)/$(PLUGIN).pot
++
++%.mo: %.po
++	msgfmt -c -o $@ $<
++
++$(I18Npot): $(wildcard *.[ch] *.[ch]xx *.cc *.[ch]pp *.hh)
++	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --msgid-bugs-address='<http://qa.mandriva.com/>' -o $@ $^
++
++%.po: $(I18Npot)
++	msgmerge -U --no-wrap --no-location --backup=none -q $@ $<
++	@touch $@
++
++$(I18Nmsgs): $(LOCALEDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
++	@mkdir -p $(dir $@)
++	cp $< $@
++
++.PHONY: i18n
++i18n: $(I18Nmsgs)
++
+ ### Targets:
+ 
+-all: libvdr-$(PLUGIN).so
++all: libvdr-$(PLUGIN).so i18n
+ 
+ libvdr-$(PLUGIN).so: $(OBJS)
+ 	$(CXX) $(CXXFLAGS) -shared $(OBJS) -o $@
+@@ -80,4 +105,5 @@
+ 	@echo Distribution package created as $(PACKAGE).tgz
+ 
+ clean:
++	@-rm -f $(PODIR)/*.mo $(PODIR)/*.pot
+ 	@-rm -f $(OBJS) $(DEPFILE) *.so *.tgz core* *~
+Index: launcher-0.0.2a/i18n.c
+===================================================================
+--- launcher-0.0.2a/i18n.c
++++ launcher-0.0.2a/i18n.c	2008-04-24 00:26:58.000000000 +0300
+@@ -1,70 +0,0 @@
+-/*
+- * autotimer.c: A plugin for the Video Disk Recorder
+- *
+- * See the README file for copyright information and how to reach the author.
+- *
+- * $Id: i18n.c 1.1 2004/04/24 10:08:10 hflor Exp $
+- */
+-
+-#include "i18n.h"
+-
+-const tI18nPhrase Phrases[] = {
+-  { "Plugins",
+-    "",// TODO Deutch
+-    "",// TODO Slovenski
+-    "",// TODO Italiano
+-    "",// TODO Nederlands
+-    "",// TODO Português
+-    "",// TODO Français
+-    "",// TODO Norsk
+-    "Laajennokset",
+-    "",// TODO Polski
+-    "",// TODO Español
+-    "",// TODO ÅëëçíéêÜ (Greek)
+-    "",// TODO Svenska
+-    "",// TODO Romaneste
+-    "",// TODO Magyar
+-    "",// TODO Català
+-    "",// TODO ÀãááÚØÙ (Russian)
+-    "",// TODO Hrvatski (Croatian)
+-  },
+-  { "A plugin to launch other plugins",
+-    "",// TODO Deutch
+-    "",// TODO Slovenski
+-    "",// TODO Italiano
+-    "",// TODO Nederlands
+-    "",// TODO Português
+-    "",// TODO Français
+-    "",// TODO Norsk
+-    "Laajennos laajennoksille",
+-    "",// TODO Polski
+-    "",// TODO Español
+-    "",// TODO ÅëëçíéêÜ (Greek)
+-    "",// TODO Svenska
+-    "",// TODO Romaneste
+-    "",// TODO Magyar
+-    "",// TODO Català
+-    "",// TODO ÀãááÚØÙ (Russian)
+-    "",// TODO Hrvatski (Croatian)
+-  },
+-  { "This plugin has no info text!",
+-    "Dieses Plugin hat keinen Infotext!",
+-    "",// TODO Slovenski
+-    "",// TODO Italiano
+-    "",// TODO Nederlands
+-    "",// TODO Português
+-    "",// TODO Français
+-    "",// TODO Norsk
+-    "Laajennoksella ei ole infotekstiä!",
+-    "",// TODO Polski
+-    "",// TODO Español
+-    "",// TODO ÅëëçíéêÜ (Greek)
+-    "",// TODO Svenska
+-    "",// TODO Romaneste
+-    "",// TODO Magyar
+-    "",// TODO Català
+-    "",// TODO ÀãááÚØÙ (Russian)
+-    "",// TODO Hrvatski (Croatian)
+-  },
+-  { NULL }
+-  };
+Index: launcher-0.0.2a/i18n.h
+===================================================================
+--- launcher-0.0.2a/i18n.h
++++ launcher-0.0.2a/i18n.h	2008-04-24 00:26:58.000000000 +0300
+@@ -1,16 +0,0 @@
+-/*
+- * autotimer.c: A plugin for the Video Disk Recorder
+- *
+- * See the README file for copyright information and how to reach the author.
+- *
+- * $Id: i18n.h 1.0 2004/04/05 13:36:00 hflor Exp $
+- */
+-
+-#ifndef _I18N__H
+-#define _I18N__H
+-
+-#include <vdr/i18n.h>
+-
+-extern const tI18nPhrase Phrases[];
+-
+-#endif //_I18N__H
+Index: launcher-0.0.2a/launcher.c
+===================================================================
+--- launcher-0.0.2a/launcher.c
++++ launcher-0.0.2a/launcher.c	2008-04-24 00:26:58.000000000 +0300
+@@ -10,10 +10,10 @@
+ #include <vdr/plugin.h>
+ #include <vdr/status.h>
+ #include <vdr/menu.h>
+-#include "i18n.h"
++
+ 
+ static const char *VERSION        = "0.0.2a";
+-static const char *DESCRIPTION    = "A plugin to launch other plugins";
++static const char *DESCRIPTION    = trNOOP("A plugin to launch other plugins");
+ static const char *MAINMENUENTRY  = "Plugins";
+ static int PluginIndex = -1;    // selected plugin
+ 
+@@ -260,7 +260,7 @@
+ bool cPluginLauncher::Initialize(void)
+ {
+   // Initialize any background activities the plugin shall perform.
+-  RegisterI18n(Phrases);
++  
+   return true;
+ }
+ 
+Index: launcher-0.0.2a/po/de_DE.po
+===================================================================
+--- launcher-0.0.2a/po/de_DE.po
++++ launcher-0.0.2a/po/de_DE.po	2008-04-24 00:26:58.000000000 +0300
+@@ -0,0 +1,44 @@
++# VDR launcher plugin language source file.
++# Copyright (C) YEAR THE VDR-launcher'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the VDR-launcher package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++#
++msgid ""
++msgstr ""
++"Project-Id-Version: VDR-launcher\n"
++"Report-Msgid-Bugs-To: http://qa.mandriva.com/\n"
++"POT-Creation-Date: 2008-04-24 00:26+0300\n"
++"PO-Revision-Date: 2008-04-24 00:26+0300\n"
++"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
++"Language-Team: <vdr@linuxtv.org>\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=ISO-8859-15\n"
++"Content-Transfer-Encoding: 8bit\n"
++
++#: launcher.c:16
++msgid "A plugin to launch other plugins"
++msgstr ""
++
++#: launcher.c:60
++msgid "Plugins"
++msgstr ""
++
++#: launcher.c:166
++msgid "This plugin has no info text!"
++msgstr "Dieses Plugin hat keinen Infotext!"
++
++#: launcher.c:182
++msgid "This plugin has no setup parameters!"
++msgstr ""
++
++#: launcher.c:192
++msgid "Info"
++msgstr ""
++
++#: launcher.c:192
++msgid "Open"
++msgstr ""
++
++#: launcher.c:192
++msgid "Setup"
++msgstr ""
+Index: launcher-0.0.2a/po/fi_FI.po
+===================================================================
+--- launcher-0.0.2a/po/fi_FI.po
++++ launcher-0.0.2a/po/fi_FI.po	2008-04-24 00:26:58.000000000 +0300
+@@ -0,0 +1,44 @@
++# VDR launcher plugin language source file.
++# Copyright (C) YEAR THE VDR-launcher'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the VDR-launcher package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++#
++msgid ""
++msgstr ""
++"Project-Id-Version: VDR-launcher\n"
++"Report-Msgid-Bugs-To: http://qa.mandriva.com/\n"
++"POT-Creation-Date: 2008-04-24 00:26+0300\n"
++"PO-Revision-Date: 2008-04-24 00:26+0300\n"
++"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
++"Language-Team: <vdr@linuxtv.org>\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=ISO-8859-15\n"
++"Content-Transfer-Encoding: 8bit\n"
++
++#: launcher.c:16
++msgid "A plugin to launch other plugins"
++msgstr "Laajennos laajennoksille"
++
++#: launcher.c:60
++msgid "Plugins"
++msgstr "Laajennokset"
++
++#: launcher.c:166
++msgid "This plugin has no info text!"
++msgstr "Laajennoksella ei ole infotekstiä!"
++
++#: launcher.c:182
++msgid "This plugin has no setup parameters!"
++msgstr ""
++
++#: launcher.c:192
++msgid "Info"
++msgstr ""
++
++#: launcher.c:192
++msgid "Open"
++msgstr ""
++
++#: launcher.c:192
++msgid "Setup"
++msgstr ""
+Index: launcher-0.0.2a/po/launcher.pot
+===================================================================
+--- launcher-0.0.2a/po/launcher.pot
++++ launcher-0.0.2a/po/launcher.pot	2008-04-24 00:26:58.000000000 +0300
+@@ -0,0 +1,45 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++#
++#, fuzzy
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: http://qa.mandriva.com/\n"
++"POT-Creation-Date: 2008-04-24 00:26+0300\n"
++"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
++"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
++"Language-Team: LANGUAGE <LL@li.org>\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=CHARSET\n"
++"Content-Transfer-Encoding: 8bit\n"
++
++#: launcher.c:16
++msgid "A plugin to launch other plugins"
++msgstr ""
++
++#: launcher.c:60
++msgid "Plugins"
++msgstr ""
++
++#: launcher.c:166
++msgid "This plugin has no info text!"
++msgstr ""
++
++#: launcher.c:182
++msgid "This plugin has no setup parameters!"
++msgstr ""
++
++#: launcher.c:192
++msgid "Info"
++msgstr ""
++
++#: launcher.c:192
++msgid "Open"
++msgstr ""
++
++#: launcher.c:192
++msgid "Setup"
++msgstr ""
