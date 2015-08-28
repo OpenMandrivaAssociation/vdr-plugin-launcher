@@ -3,7 +3,7 @@
 Summary:	VDR plugin: launch other plugins
 Name:		vdr-plugin-%plugin
 Version:	0.0.2a
-Release:	18
+Release:	19
 Group:		Video
 License:	GPL
 URL:		http://people.freenet.de/cwieninger/html/vdr-launcher.html
