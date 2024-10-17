@@ -6,7 +6,7 @@ Version:	0.0.2a
 Release:	19
 Group:		Video
 License:	GPL
-URL:		http://people.freenet.de/cwieninger/html/vdr-launcher.html
+URL:		https://people.freenet.de/cwieninger/html/vdr-launcher.html
 Source:		http://people.freenet.de/cwieninger/vdr_1.3.11-%plugin-%{version}.tar.bz2
 Patch0:		launcher-0.0.2a-i18n-1.6.patch
 BuildRequires:	vdr-devel >= 1.6.0
